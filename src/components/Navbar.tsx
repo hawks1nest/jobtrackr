@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 
 function NavLink({ href, label }: { href: string; label: string }) {
@@ -21,23 +21,37 @@ function NavLink({ href, label }: { href: string; label: string }) {
 }
 
 export default function NavBar() {
+  const { status } = useSession();
+  const isAuthed = status === "authenticated";
+
+  const logoHref = isAuthed ? "/dashboard" : "/login";
+
   return (
-    <header className="border-b bg-red-200">
+    <header className="border-b bg-white">
       <div className="mx-auto flex max-w-5xl items-center justify-between p-3">
-        <Link href="/dashboard" className="font-semibold px-2">
+        <Link href={logoHref} className="font-semibold px-2">
           JobTrackr
         </Link>
 
         <nav className="flex items-center gap-4">
-          <NavLink href="/dashboard" label="Dashboard" />
-          <NavLink href="/companies" label="Companies" />
-          <NavLink href="/applications" label="Applications" />
-          <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
-            className="rounded bg-black px-3 py-2 text-sm text-white"
-          >
-            Logout
-          </button>
+          {isAuthed ? (
+            <>
+              <NavLink href="/dashboard" label="Dashboard" />
+              <NavLink href="/companies" label="Companies" />
+              <NavLink href="/applications" label="Applications" />
+              <button
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="rounded bg-black px-3 py-2 text-sm text-white"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink href="/login" label="Login" />
+              <NavLink href="/signup" label="Sign up" />
+            </>
+          )}
         </nav>
       </div>
     </header>

@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Company = { id: string; name: string; createdAt: string };
 
 export default function CompaniesPage() {
+  const router = useRouter();
+
   const [companies, setCompanies] = useState<Company[]>([]);
   const [name, setName] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
@@ -12,16 +15,24 @@ export default function CompaniesPage() {
   async function load() {
     setMsg(null);
     const res = await fetch("/api/companies");
-    if (!res.ok) {
-      setMsg("Not logged in. Go to /login");
+
+    if (res.status === 401) {
+      router.replace("/login");
       return;
     }
+
+    if (!res.ok) {
+      setMsg("Something went wrong.");
+      return;
+    }
+
     const data = await res.json();
     setCompanies(data.companies ?? []);
   }
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function addCompany(e: React.FormEvent) {
@@ -33,6 +44,11 @@ export default function CompaniesPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
     });
+
+    if (res.status === 401) {
+      router.replace("/login");
+      return;
+    }
 
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));

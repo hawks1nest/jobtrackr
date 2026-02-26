@@ -76,9 +76,12 @@ export default function ApplicationsPage() {
     <div className="p-6 max-w-2xl">
       <h1 className="text-2xl font-semibold">Applications</h1>
       {companies.length === 0 && (
-  <p className="mt-4 text-sm text-red-600">
-    No companies yet. Add one first at{" "}
-    <a className="underline" href="/companies">/companies</a>.
+  <p className="mt-4 rounded border border-dashed p-3 text-sm text-gray-700">
+    You don’t have any companies yet.{" "}
+    <a href="/companies" className="font-medium underline">
+      Add your first company
+    </a>{" "}
+    to start tracking applications.
   </p>
 )}
       <form onSubmit={addApplication} className="mt-6 grid gap-2">
